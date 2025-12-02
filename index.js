@@ -9,6 +9,7 @@ const bodyParser = require('body-parser')
 
 const indexRouter = require('./routes/index')
 const authorsRouter = require('./routes/authors')
+const booksRouter = require('./routes/books')
 
 app.set('view engine', 'ejs')
 app.set('views', __dirname + '/views')
@@ -25,5 +26,11 @@ db.once('open', () => console.log('Connected to mongoose'))
 
 app.use('/', indexRouter)
 app.use('/authors', authorsRouter)
+app.use('/books', booksRouter)
 
-app.listen(process.env.PORT || 3000)
+const port = process.env.PORT || 3000; // Use the PORT environment variable if available, otherwise default to 3000
+
+// Start your server on the determined port
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
