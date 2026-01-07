@@ -39,10 +39,9 @@ router.get('/:id', async (req, res) => {
         if(!book){
             return res.redirect('/')
         }
-        //TODO
         if(!book.author){
             await Book.deleteOne({ _id: book.id })
-            res.redirect('/')
+            res.redirect('/books')
         }
         res.render('books/show', { book: book })
     }catch{
@@ -79,25 +78,25 @@ router.post('/', async (req, res) => {
 })
 
 //PUT Book
-//FIX
 router.put('/:id', async (req, res) => {
     let book
     try{
-        book = Book.findById(req.params.id)
+        book = await Book.findById(req.params.id)
         book.author = req.body.author
         book.title = req.body.title
         book.publishDate = new Date(req.body.publishDate)
         book.pageCount = req.body.pageCount
         book.description = req.body.description
-        saveCover(book, req.body.cover)
+        if (req.body.cover != null && req.body.cover !== '') {
+            saveCover(book, req.body.cover)
+        }
         await book.save()
         res.redirect(`/books/${book.id}`)
     }catch{
-        if(book == null){
-            res.redirect('/')
-            
-        }else{
+        if(book != null){
             renderPage(res, book, 'edit', true)
+        }else{
+            res.redirect('/')
         }
     }
 })
@@ -107,7 +106,7 @@ router.delete('/:id', async (req, res) => {
     let book
     try{
         book = await Book.findByIdAndDelete(req.params.id)
-        res.redirect(`/books`)
+        res.redirect('/books')
     }catch(err){
         if(book == null){
             res.redirect('/')
